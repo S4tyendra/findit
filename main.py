@@ -13,10 +13,11 @@ from fastapi.staticfiles import StaticFiles
 
 # Import API routers
 from api import items as items_router
-from api import locations as locations_router # Import locations router
+from api import locations as locations_router
+from api import found_items as found_items_router # Import found items router
 
 app = f.FastAPI(
-    title="Lost & Found Backend", # Updated title
+    title="Lost & Found Backend",
     # lifespan=lifespan #lifespan for cleaner startup/shutdown
 )
 
@@ -38,6 +39,7 @@ app.add_middleware(
 # Include API routers
 app.include_router(items_router.router)
 app.include_router(locations_router.router)
+app.include_router(found_items_router.router) # Include found items router
 
 
 @app.on_event("startup")
@@ -47,15 +49,17 @@ async def startup_event():
     db_instance = mongo_manager.get_db()
     try:
         # Indexes for the lost_items collection
+        # Indexes for the lost_items collection
         await db_instance.lost_items.create_index("management_token", unique=True)
         await db_instance.lost_items.create_index("created_at")
         await db_instance.lost_items.create_index("reporter_email")
-        # Add indexes for location fields later if needed for filtering (Phase 4)
-        # await db_instance.lost_items.create_index("country")
-        # await db_instance.lost_items.create_index("state")
-        # await db_instance.lost_items.create_index("city")
-        logger.info("Ensured indexes on 'lost_items' collection (management_token, created_at, reporter_email).")
+        # TODO: Consider indexes on location and description for matching?
+        logger.info("Ensured indexes on 'lost_items'.")
 
+        # Indexes for the found_items collection
+        await db_instance.found_items.create_index("created_at")
+        # TODO: Consider indexes on location and description for matching?
+        logger.info("Ensured indexes on 'found_items'.")
     except Exception as e:
         logger.error(f"Error creating database indexes during startup: {e}")
 

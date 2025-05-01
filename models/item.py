@@ -23,9 +23,9 @@ class LostItemDB(LostItemBase):
     id: str = p.Field(default_factory=lambda: str(uuid.uuid4()), alias="_id") # Use UUID for primary key
     management_token: str = p.Field(default_factory=lambda: str(uuid.uuid4()))
     created_at: datetime = p.Field(default_factory=datetime.utcnow)
-    # Details added when someone reports finding the item
-    found_by_contact: Optional[str] = None # Store finder's email/whatsapp/etc.
-    found_at: Optional[datetime] = None    # Timestamp when reported found
+    # found_by_contact: Optional[str] = None # Replaced by found_reports
+    # found_at: Optional[datetime] = None    # Replaced by found_reports
+    found_reports: List['FoundReportDetail'] = p.Field(default_factory=list) # Embed list of found reports
 
     class Config:
         allow_population_by_field_name = True # Allows using '_id' when populating from DB
@@ -62,6 +62,27 @@ class LostItemManagementResponse(LostItemDB):
 class ItemFoundPayload(p.BaseModel):
     """Payload for reporting an item as found."""
     finder_contact: str = p.Field(..., min_length=5, max_length=200, description="Contact info of the finder (e.g., email, phone, message)")
+
+# --- Model for Embedded Found Report Details ---
+
+class FoundReportDetail(p.BaseModel):
+    """Details provided by someone reporting they found a specific lost item."""
+    report_id: str = p.Field(default_factory=lambda: str(uuid.uuid4())) # Unique ID for this report
+    finder_contact: str = p.Field(..., min_length=5, max_length=200)
+    report_timestamp: datetime = p.Field(default_factory=datetime.utcnow)
+    finder_description: Optional[str] = p.Field(None, max_length=1000)
+    date_found: Optional[datetime] = None
+    # Location where the finder found it
+    found_country: Optional[str] = None
+    found_state: Optional[str] = None
+    found_city: Optional[str] = None
+    finder_image_filenames: List[str] = p.Field(default_factory=list, max_length=5) # Images uploaded by the finder
+
+    class Config:
+         json_encoders = {
+             datetime: lambda dt: dt.isoformat(),
+             uuid.UUID: str,
+         }
 
 # --- Payload Model for Update Endpoint ---
 

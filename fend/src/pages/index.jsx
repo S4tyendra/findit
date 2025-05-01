@@ -113,9 +113,14 @@ export default function HomePage() {
                     <h2 className="text-xl font-semibold">Recently Reported Items</h2>
                      {/* Mobile Branding (Hidden on Medium+) */}
                      <h1 className="text-xl font-bold md:hidden">Lost & Found</h1>
+                     <div className="flex space-x-2">
+                     <Link href="/report-found" passHref>
+                        <Button>Report Found Item</Button>
+                    </Link>
                     <Link href="/report" passHref>
                         <Button>Report Lost Item</Button>
                     </Link>
+                    </div>
                 </div>
 
                 {renderItemList()}
