@@ -200,7 +200,6 @@ const PublicItemPage = () => {
                                      {/* Date Found */}
                                     <div>
                                         <Label htmlFor="dateFound">Date Found (Optional)</Label>
-                                         {/* TODO: Replace with shadcn DatePicker */}
                                         <Input id="dateFound" type="date" onChange={handleDateFoundChange} className="mt-1"/>
                                     </div>
                                     {/* Location Found */}

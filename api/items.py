@@ -18,7 +18,7 @@ from models.item import (
 from models.found_item import (
     FoundItemCreate, FoundItemDB, FoundItemPublicResponse
 )
-from db_setup import get_db, config
+from db_setup import get_db, config # Import config object directly
 from helpers.logger import logger
 from helpers.email_utils import send_email
 
@@ -89,8 +89,7 @@ async def create_lost_item(
         if not insert_result.inserted_id: raise HTTPException(status_code=500, detail="Failed to save item report.")
         logger.info(f"Inserted item {item_db.id} into database.")
 
-        frontend_base_url = "http://localhost:3000" # TODO: Config
-        mgmt_link = f"{frontend_base_url}/manage/{item_db.id}?token={item_db.management_token}"
+        mgmt_link = f"{config.FRONTEND_BASE_URL}/manage/{item_db.id}?token={item_db.management_token}"
         email_subj = "Your Lost Item Report"
         email_body = f"Report details:\nDesc: {item_db.description}\nManage: {mgmt_link}\nKeep link secure."
         email_sent = send_email(to_email=item_db.reporter_email, subject=email_subj, body=email_body)

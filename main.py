@@ -53,12 +53,14 @@ async def startup_event():
         await db_instance.lost_items.create_index("management_token", unique=True)
         await db_instance.lost_items.create_index("created_at")
         await db_instance.lost_items.create_index("reporter_email")
-        # TODO: Consider indexes on location and description for matching?
+        await db_instance.lost_items.create_index([("description", "text")], name="description_text_index") # Add text index
+        # TODO: Consider indexes on location for matching?
         logger.info("Ensured indexes on 'lost_items'.")
 
         # Indexes for the found_items collection
         await db_instance.found_items.create_index("created_at")
-        # TODO: Consider indexes on location and description for matching?
+        await db_instance.found_items.create_index([("description", "text")], name="description_text_index") # Add text index
+        # TODO: Consider indexes on location for matching?
         logger.info("Ensured indexes on 'found_items'.")
     except Exception as e:
         logger.error(f"Error creating database indexes during startup: {e}")
