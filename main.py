@@ -71,47 +71,45 @@ async def shutdown_event():
     await mongo_manager.disconnect()
     logger.info("FastAPI application has been shut down.")
 
+# Import required dependencies
+from fastapi.staticfiles import StaticFiles
+from fastapi.middleware.httpsredirect import HTTPSRedirectMiddleware
+from starlette.middleware.base import BaseHTTPMiddleware
+import httpx
+
+# Proxy middleware for development
+class DevProxyMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request, call_next):
+        if not request.url.path.startswith("/api") and not request.url.path.startswith("/images"):
+            # Proxy to Vite dev server
+            async with httpx.AsyncClient() as client:
+                try:
+                    url = f"http://localhost:5353{request.url.path}"
+                    if request.url.query:
+                        url = f"{url}?{request.url.query}"
+                    
+                    response = await client.request(
+                        method=request.method,
+                        url=url,
+                        headers=request.headers,
+                        content=await request.body()
+                    )
+                    
+                    return f.Response(
+                        content=response.content,
+                        status_code=response.status_code,
+                        headers=dict(response.headers)
+                    )
+                except httpx.RequestError:
+                    return f.Response(status_code=503, content="Vite dev server is not running")
+        return await call_next(request)
+
 # Mount static files directory for uploaded images
 app.mount("/images", StaticFiles(directory="images"), name="uploaded_images")
 
-static_dir = "dist" # Frontend build output
+# Add proxy middleware in development
 
-@app.get("/{full_path:path}")
-async def serve_spa(full_path: str):
-    """
-    Serves the index.html for SPA routing, or specific files if they exist.
-    Handles requests that weren't matched by API routes or /static mount.
-    """
-    spa_index = os.path.join(static_dir, "index.html")
-    abs_static_dir = os.path.abspath(static_dir)
-
-    # Check if path exists with .html extension for Next.js pages
-    if not full_path.endswith(".html") and not full_path.endswith(".svg") and not full_path.endswith(".ico"):
-        html_path = os.path.join(abs_static_dir, f"{full_path}.html")
-        if os.path.isfile(html_path):
-            return f.responses.FileResponse(html_path)
-    
-    # If this is a specific path request, try to serve it
-    abs_requested_path = os.path.abspath(os.path.join(abs_static_dir, full_path))
-    if not abs_requested_path.startswith(abs_static_dir):
-        logger.warning(f"Directory traversal attempt blocked: {full_path}")
-        raise f.HTTPException(status_code=404, detail="Not Found")
-    
-    if os.path.isfile(abs_requested_path):
-        return f.responses.FileResponse(abs_requested_path)
-    
-    # Fallback to SPA index
-    if os.path.exists(spa_index):
-        return f.responses.FileResponse(spa_index)
-    else:
-        logger.error(f"SPA index file '{spa_index}' not found.")
-        raise f.HTTPException(status_code=404, detail="SPA index not found")
-
-if os.path.isdir(static_dir):
-    app.mount("/_next", staticfiles.StaticFiles(directory=os.path.join(static_dir, "_next")), name="next_assets")
-    app.mount("/", staticfiles.StaticFiles(directory=static_dir), name="static_assets")
-else:
-    logger.error(f"Static files directory '{static_dir}' still not found after check. SPA serving will fail.")
+app.add_middleware(DevProxyMiddleware)
 
 if __name__ == "__main__":
     import uvicorn
