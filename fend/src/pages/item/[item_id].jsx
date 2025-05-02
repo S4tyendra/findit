@@ -91,18 +91,8 @@ const PublicItemPage = () => {
             formData.append('finder_images', imageFile);
         });
 
-        // TODO: Update apiClient.notifyFound to accept FormData
-        console.warn("TODO: Update apiClient.notifyFound to handle FormData");
         try {
-            // --- MOCK API CALL (Replace with actual call later) ---
-            console.log("Submitting Found Report FormData for item:", item_id);
-            // Example: Log FormData entries
-            // for (let [key, value] of formData.entries()) {
-            //     console.log(`${key}: ${value instanceof File ? value.name : value}`);
-            // }
-            await new Promise(resolve => setTimeout(resolve, 1500)); // Simulate network
-            // Assume success for now
-             // await notifyFound(item_id, formData); // Replace mock with this call
+            await notifyFound(item_id, formData);
             // --- End Mock ---
 
             setFoundSubmitSuccess(true);

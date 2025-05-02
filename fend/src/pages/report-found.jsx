@@ -110,8 +110,8 @@ const ReportFoundItemPage = () => {
                         </div>
                         {/* Finder Contact (Optional) */}
                         <div>
-                            <Label htmlFor="finderContact">Your Contact Info (Optional)</Label>
-                            <Input id="finderContact" type="text" value={finderContact} onChange={(e) => setFinderContact(e.target.value)} placeholder="Email, phone, etc. (If you want the owner to contact you)" className="mt-1"/>
+                            <Label htmlFor="finderContact">Your email *</Label>
+                            <Input id="finderContact" type="email" required value={finderContact} onChange={(e) => setFinderContact(e.target.value)} placeholder="Email (If you want the owner to contact you)" className="mt-1"/>
                              <p className="text-xs text-muted-foreground mt-1">If provided, this may be shown publicly or shared if a match is found.</p>
                         </div>
                         {/* Location Found */}

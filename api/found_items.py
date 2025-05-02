@@ -11,7 +11,7 @@ import shutil
 from models.found_item import FoundItemCreate, FoundItemDB, FoundItemPublicResponse
 from db_setup import get_db, config
 from helpers.logger import logger
-# Note: No email sending needed here unless we add notifications later
+from helpers.email_utils import send_email
 
 # Use the same IMAGE_DIR as defined in api/items.py or main.py
 # Ensure consistency or move IMAGE_DIR definition to config.py
@@ -131,6 +131,56 @@ async def get_public_found_item(item_id: str, db: AsyncIOMotorDatabase = Depends
 
     logger.info(f"Successfully retrieved public found item {item_id}.")
     return item
+
+
+# --- Found Item Claim Models ---
+class FoundItemClaim(p.BaseModel):
+    owner_email: p.EmailStr = p.Field(..., description="Email of the person claiming ownership")
+    owner_description: str = p.Field(..., min_length=10, max_length=1000, description="Description from owner to verify claim")
+
+@router.post("/{item_id}/claim", status_code=f.status.HTTP_204_NO_CONTENT)
+async def claim_found_item(
+    item_id: str, 
+    claim_data: FoundItemClaim,
+    db: AsyncIOMotorDatabase = Depends(get_db)
+):
+    """Submit a claim for a found item."""
+    logger.info(f"Received claim for found item {item_id}")
+    try: uuid.UUID(item_id)
+    except ValueError: raise HTTPException(status_code=400, detail="Invalid item ID format.")
+    logger.debug(f"Claim data: {claim_data.json()}")
+    # Get the found item to verify it exists and get finder contact info
+    item = await db.found_items.find_one({"_id": item_id})
+    logger.debug(f"Found item details: {item}")
+    if item is None: raise HTTPException(status_code=404, detail="Found item not found.")
+    
+    # Only proceed if finder provided contact info
+    finder_contact = item.get('finder_contact')
+    logger.debug(f"Finder contact info: {finder_contact}")
+    if not finder_contact:
+        logger.warning(f"Found item {item_id} has no finder contact info")
+        raise HTTPException(status_code=400, detail="This item cannot be claimed as the finder did not provide contact information.")
+
+    # Send email to finder with claim details
+    email_subj = "Someone has claimed your found item!"
+    email_body = (
+        f"Someone has claimed the item you reported finding!\n\n"
+        f"Item Description: {item['description']}\n"
+        f"Date Found: {item['date_found']}\n\n"
+        f"Claimant's Contact: {claim_data.owner_email}\n"
+        f"Their Description: {claim_data.owner_description}\n\n"
+        f"If you believe this is the rightful owner, please contact them directly.\n"
+        f"If not, you can ignore this email. Be cautious when verifying ownership."
+    )
+    logger.debug(f"Sending claim email to finder: {finder_contact}")
+    
+    email_sent = send_email(to_email=finder_contact, subject=email_subj, body=email_body)
+    if not email_sent:
+        logger.error(f"Failed to send claim email to finder {finder_contact} for item {item_id}")
+        raise HTTPException(status_code=500, detail="Failed to notify the finder. Please try again later.")
+    
+    logger.info(f"Successfully processed claim for item {item_id}")
+    return f.Response(status_code=f.status.HTTP_204_NO_CONTENT)
 
 
 # TODO: Add recommendation logic/endpoints (Phase 10)

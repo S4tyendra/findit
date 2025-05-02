@@ -46,7 +46,6 @@ const ReportLostItemPage = () => {
              setIsLoading(false);
              return;
         }
-
         const formData = new FormData();
         formData.append('description', description);
         formData.append('reporter_email', reporterEmail);

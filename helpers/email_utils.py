@@ -1,6 +1,6 @@
 import smtplib
 from email.message import EmailMessage
-from config import Config  # Import the Config class
+from config import Config
 from helpers.logger import logger
 
 config = Config() # Instantiate the config object
@@ -35,10 +35,17 @@ def send_email(to_email: str, subject: str, body: str) -> bool:
         logger.info(f"Successfully sent email to {to_email} with subject: {subject}")
         return True
     except smtplib.SMTPAuthenticationError:
+        # pass
         logger.error(f"SMTP Authentication failed for {config.EMAIL_SENDER}. Check credentials or 'less secure app access'.")
     except smtplib.SMTPConnectError:
-         logger.error(f"Failed to connect to SMTP server {config.SMTP_SERVER}:{config.SMTP_PORT}.")
+        logger.error(f"Failed to connect to SMTP server {config.SMTP_SERVER}:{config.SMTP_PORT}.")
     except Exception as e:
+        # pass
         logger.error(f"Failed to send email to {to_email}: {e}", exc_info=True)
 
     return False
+
+
+# Example usage:
+# if __name__ == "__main__":
+#     send_email("satya@satyendra.in", "Test Subject", "This is a test email body.")
