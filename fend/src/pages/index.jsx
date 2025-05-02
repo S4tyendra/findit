@@ -5,7 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ArrowRight, Search, Map, Bell } from 'lucide-react';
+import { ArrowRight, Search, Map, Bell, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext } from "@/components/ui/carousel";
 
 export default function HomePage() {
     const [lostItems, setLostItems] = useState([]);
@@ -31,7 +32,6 @@ export default function HomePage() {
         })
         .catch(err => {
             console.error("Error fetching items for homepage:", err);
-            // Set a generic error or specific ones if needed
             setErrorLost('Failed to load lost items.');
             setErrorFound('Failed to load found items.');
         })
@@ -46,9 +46,52 @@ export default function HomePage() {
         if (!dateString) return 'N/A';
         try {
             return new Date(dateString).toLocaleDateString(undefined, {
-                 year: 'numeric', month: 'short', day: 'numeric'
+                year: 'numeric', month: 'short', day: 'numeric'
             });
         } catch (e) { return dateString; }
+    };
+
+    // Function to truncate description to 5 words
+    const truncateDescription = (desc) => {
+        if (!desc) return 'No description available';
+        const words = desc.split(' ');
+        return words.slice(0, 5).join(' ') + (words.length > 5 ? '...' : '');
+    };
+
+    // Function to render image carousel
+    const renderImageCarousel = (images) => {
+        if (!images || images.length === 0) {
+            return (
+                <div className="w-full aspect-square bg-muted/30 rounded-lg flex items-center justify-center">
+                    <p className="text-sm text-muted-foreground">No images</p>
+                </div>
+            );
+        }
+
+        return (
+            <Carousel className="w-full">
+                <CarouselContent>
+                    {images.map((filename, index) => (
+                        <CarouselItem key={index}>
+                            <div className="relative aspect-square">
+                                <img 
+                                    src={`http://localhost:5424/images/${filename}`} 
+                                    alt={`Item image ${index + 1}`}
+                                    className="absolute inset-0 w-full h-full object-cover rounded-lg"
+                                    loading="lazy"
+                                />
+                            </div>
+                        </CarouselItem>
+                    ))}
+                </CarouselContent>
+                {images.length > 1 && (
+                    <>
+                        <CarouselPrevious className="left-2" />
+                        <CarouselNext className="right-2" />
+                    </>
+                )}
+            </Carousel>
+        );
     };
 
     return (
@@ -65,16 +108,16 @@ export default function HomePage() {
                             Our community-driven platform helps connect lost items with their owners. Report what you've lost or found, and let's make reuniting easier.
                         </p>
                         <div className="flex flex-wrap justify-center gap-4">
-                            <Link href="/report" passHref>
-                                <Button size="lg" className="gap-2">
+                            <Button size="lg" className="gap-2" asChild>
+                                <Link href="/report">
                                     Report Lost Item <ArrowRight className="w-4 h-4" />
-                                </Button>
-                            </Link>
-                            <Link href="/found" passHref>
-                                <Button size="lg" variant="outline" className="gap-2">
+                                </Link>
+                            </Button>
+                            <Button size="lg" variant="outline" className="gap-2" asChild>
+                                <Link href="/found">
                                     Browse Found Items <Search className="w-4 h-4" />
-                                </Button>
-                            </Link>
+                                </Link>
+                            </Button>
                         </div>
                     </div>
                 </div>
@@ -136,37 +179,33 @@ export default function HomePage() {
                             {isLoadingLost ? (
                                 Array(3).fill(0).map((_, i) => (
                                     <Card key={i} className="bg-card/50 backdrop-blur-sm">
-                                        <CardHeader>
-                                            <Skeleton className="h-4 w-2/3" />
-                                            <Skeleton className="h-4 w-full mt-2" />
-                                        </CardHeader>
-                                        <CardContent>
-                                            <Skeleton className="h-20 w-full rounded-lg" />
+                                        <CardContent className="p-4">
+                                            <Skeleton className="h-[300px] w-full rounded-lg mb-4" />
+                                            <Skeleton className="h-4 w-2/3 mb-2" />
+                                            <Skeleton className="h-4 w-full" />
                                         </CardContent>
                                     </Card>
                                 ))
                             ) : (
                                 lostItems.map(item => (
                                     <Card key={item._id} className="group hover:shadow-lg transition-all duration-300 bg-card/50 backdrop-blur-sm">
-                                        <CardHeader>
-                                            <CardTitle className="line-clamp-1">{item.title}</CardTitle>
-                                            <CardDescription className="line-clamp-2">{item.description}</CardDescription>
-                                        </CardHeader>
-                                        <CardContent>
-                                            <p className="text-sm text-muted-foreground">
-                                                Lost on: {formatDate(item.date)}
-                                            </p>
-                                            <p className="text-sm text-muted-foreground">
-                                                Location: {item.location || 'Not specified'}
-                                            </p>
+                                        <CardContent className="p-4">
+                                            {renderImageCarousel(item.image_filenames)}
+                                            <div className="mt-4 space-y-2">
+                                                <p className="text-sm text-muted-foreground">
+                                                    {truncateDescription(item.description)}
+                                                </p>
+                                                <div className="flex justify-between items-center text-xs text-muted-foreground">
+                                                    <span>Lost: {formatDate(item.date_lost || item.created_at)}</span>
+                                                    <span>{[item.city, item.state, item.country].filter(Boolean).join(', ') || 'Location N/A'}</span>
+                                                </div>
+                                                <Link href={`/item/${item._id}`} passHref>
+                                                    <Button variant="ghost" size="sm" className="w-full border mt-2 group-hover:bg-primary/10">
+                                                        View Details
+                                                    </Button>
+                                                </Link>
+                                            </div>
                                         </CardContent>
-                                        <CardFooter>
-                                            <Link href={`/item/${item._id}`} passHref>
-                                                <Button variant="ghost" className="w-full group-hover:bg-primary/10">
-                                                    View Details
-                                                </Button>
-                                            </Link>
-                                        </CardFooter>
                                     </Card>
                                 ))
                             )}
@@ -193,37 +232,33 @@ export default function HomePage() {
                             {isLoadingFound ? (
                                 Array(3).fill(0).map((_, i) => (
                                     <Card key={i} className="bg-card/50 backdrop-blur-sm">
-                                        <CardHeader>
-                                            <Skeleton className="h-4 w-2/3" />
-                                            <Skeleton className="h-4 w-full mt-2" />
-                                        </CardHeader>
-                                        <CardContent>
-                                            <Skeleton className="h-20 w-full rounded-lg" />
+                                        <CardContent className="p-4">
+                                            <Skeleton className="h-[300px] w-full rounded-lg mb-4" />
+                                            <Skeleton className="h-4 w-2/3 mb-2" />
+                                            <Skeleton className="h-4 w-full" />
                                         </CardContent>
                                     </Card>
                                 ))
                             ) : (
                                 foundItems.map(item => (
                                     <Card key={item._id} className="group hover:shadow-lg transition-all duration-300 bg-card/50 backdrop-blur-sm">
-                                        <CardHeader>
-                                            <CardTitle className="line-clamp-1">{item.title}</CardTitle>
-                                            <CardDescription className="line-clamp-2">{item.description}</CardDescription>
-                                        </CardHeader>
-                                        <CardContent>
-                                            <p className="text-sm text-muted-foreground">
-                                                Found on: {formatDate(item.date)}
-                                            </p>
-                                            <p className="text-sm text-muted-foreground">
-                                                Location: {item.location || 'Not specified'}
-                                            </p>
+                                        <CardContent className="p-4">
+                                            {renderImageCarousel(item.image_filenames)}
+                                            <div className="mt-4 space-y-2">
+                                                <p className="text-sm text-muted-foreground">
+                                                    {truncateDescription(item.description)}
+                                                </p>
+                                                <div className="flex justify-between items-center text-xs text-muted-foreground">
+                                                    <span>Found: {formatDate(item.date_found || item.created_at)}</span>
+                                                    <span>{[item.city, item.state, item.country].filter(Boolean).join(', ') || 'Location N/A'}</span>
+                                                </div>
+                                                <Link href={`/found-item/${item._id}`} passHref>
+                                                    <Button variant="ghost" size="sm" className="w-full mt-2 group-hover:bg-primary/10">
+                                                        View Details
+                                                    </Button>
+                                                </Link>
+                                            </div>
                                         </CardContent>
-                                        <CardFooter>
-                                            <Link href={`/item/${item._id}`} passHref>
-                                                <Button variant="ghost" className="w-full group-hover:bg-primary/10">
-                                                    View Details
-                                                </Button>
-                                            </Link>
-                                        </CardFooter>
                                     </Card>
                                 ))
                             )}

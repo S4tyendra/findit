@@ -64,29 +64,30 @@ export default function FoundItemsPage() {
         return (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {items.map(item => (
-                    <Card key={item._id}> {/* Use _id */}
-                        <CardHeader>
+                    <Card key={item._id} className="group hover:shadow-lg transition-all duration-300 bg-card/50 backdrop-blur-sm">
+                        <CardContent className="p-4">
                              {item.image_filenames && item.image_filenames.length > 0 && (
                                  <img
                                      src={`/images/${item.image_filenames[0]}`}
                                      alt="Found item preview"
-                                     className="rounded border aspect-video object-cover mb-2"
+                                     className="rounded-lg aspect-video w-full object-cover mb-4"
                                      onError={(e) => e.target.style.display='none'}
                                  />
                              )}
-                            <CardTitle className="text-lg truncate">{item.description.substring(0, 50)}{item.description.length > 50 ? '...' : ''}</CardTitle>
-                             {/* Display date_found */}
-                             <CardDescription>Found on: {formatDate(item.date_found)}</CardDescription>
-                        </CardHeader>
-                        <CardFooter>
-                            {/* Link to a future public found item detail page? Or just display info here?
-                                For now, let's omit the link, as there isn't a specific found item detail page yet.
-                                We could add a basic `/found/[id]` page later if needed.
-                            */}
-                             {/* <Link href={`/found/${item._id}`} passHref>
-                                <Button variant="outline" size="sm">View Details</Button>
-                            </Link> */}
-                        </CardFooter>
+                            <div className="space-y-2">
+                                <h3 className="text-lg line-clamp-1 font-medium">Found Item</h3>
+                                <p className="text-sm text-muted-foreground line-clamp-2">{item.description}</p>
+                                <div className="flex justify-between items-center text-xs text-muted-foreground">
+                                    <span>Found on: {formatDate(item.date_found)}</span>
+                                    <span>{[item.city, item.state, item.country].filter(Boolean).join(', ') || 'Location N/A'}</span>
+                                </div>
+                                <Link href={`/found-item/${item._id}`} passHref>
+                                    <Button variant="ghost" size="sm" className="w-full mt-2 group-hover:bg-primary/10">
+                                        View Details
+                                    </Button>
+                                </Link>
+                            </div>
+                        </CardContent>
                     </Card>
                 ))}
             </div>
