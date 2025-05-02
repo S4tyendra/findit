@@ -75,7 +75,7 @@ export default function HomePage() {
                         <CarouselItem key={index}>
                             <div className="relative aspect-square">
                                 <img 
-                                    src={`http://localhost:5424/images/${filename}`} 
+                                    src={`${process.env.NEXT_PUBLIC_API_HOST}/images/${filename}`} 
                                     alt={`Item image ${index + 1}`}
                                     className="absolute inset-0 w-full h-full object-cover rounded-lg"
                                     loading="lazy"

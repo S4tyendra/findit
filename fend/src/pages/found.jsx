@@ -68,7 +68,7 @@ export default function FoundItemsPage() {
                         <CardContent className="p-4">
                              {item.image_filenames && item.image_filenames.length > 0 && (
                                  <img
-                                     src={`/images/${item.image_filenames[0]}`}
+                                     src={`${process.env.NEXT_PUBLIC_API_HOST}/images/${item.image_filenames[0]}`}
                                      alt="Found item preview"
                                      className="rounded-lg aspect-video w-full object-cover mb-4"
                                      onError={(e) => e.target.style.display='none'}

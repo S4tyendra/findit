@@ -56,7 +56,7 @@ const PublicItemPage = () => {
                 })
                 .finally(() => setIsLoading(false));
         } else if (!item_id && router.isReady) {
-             setIsLoading(false);
+            setIsLoading(false);
         }
     }, [router.isReady, item_id]);
 
@@ -72,8 +72,8 @@ const PublicItemPage = () => {
         }
     };
 
-     // --- Found Modal Submit Handling (Updated for FormData) ---
-     const handleFoundSubmit = async (event) => {
+    // --- Found Modal Submit Handling (Updated for FormData) ---
+    const handleFoundSubmit = async (event) => {
         event.preventDefault();
         setIsSubmittingFound(true);
         setFoundSubmitError(null);
@@ -97,16 +97,16 @@ const PublicItemPage = () => {
 
             setFoundSubmitSuccess(true);
             setTimeout(() => {
-                 setIsFoundModalOpen(false);
-                 // Reset form state
-                 setFinderContact('');
-                 setFinderDescription('');
-                 setDateFound(null);
-                 setFoundLocation({ country: '', state: '', city: '' });
-                 setFinderImages([]);
-                 setFoundSubmitError(null);
-                 setFoundSubmitSuccess(false);
-             }, 3000);
+                setIsFoundModalOpen(false);
+                // Reset form state
+                setFinderContact('');
+                setFinderDescription('');
+                setDateFound(null);
+                setFoundLocation({ country: '', state: '', city: '' });
+                setFinderImages([]);
+                setFoundSubmitError(null);
+                setFoundSubmitSuccess(false);
+            }, 3000);
         } catch (err) {
             setFoundSubmitError(err.message || "Failed to submit found report.");
         } finally {
@@ -114,18 +114,18 @@ const PublicItemPage = () => {
         }
     };
 
-     // Basic Date Input Handler (for Date Found)
-     const handleDateFoundChange = (e) => {
+    // Basic Date Input Handler (for Date Found)
+    const handleDateFoundChange = (e) => {
         try {
-             const selectedDate = new Date(e.target.value);
-             if (!isNaN(selectedDate.getTime())) {
-                 setDateFound(selectedDate);
-                 setFoundSubmitError(null); // Clear date-related error
-             } else {
-                 setDateFound(null);
-             }
+            const selectedDate = new Date(e.target.value);
+            if (!isNaN(selectedDate.getTime())) {
+                setDateFound(selectedDate);
+                setFoundSubmitError(null); // Clear date-related error
+            } else {
+                setDateFound(null);
+            }
         } catch (err) { setDateFound(null); }
-     };
+    };
 
     const formatDate = (dateString) => { /* ... (same as before) ... */
         if (!dateString) return 'N/A';
@@ -134,16 +134,16 @@ const PublicItemPage = () => {
                 year: 'numeric', month: 'long', day: 'numeric',
             });
         } catch (e) { return dateString; }
-     };
+    };
 
     if (isLoading) { /* Skeleton UI */
-        return ( <div className="container mx-auto p-4 max-w-2xl"> <Card> <CardHeader> <Skeleton className="h-6 w-3/4" /> <Skeleton className="h-4 w-1/2 mt-1" /> </CardHeader> <CardContent className="space-y-4"> <Skeleton className="h-4 w-full" /> <Skeleton className="h-4 w-full" /> <Skeleton className="h-20 w-full" /> </CardContent> <CardFooter> <Skeleton className="h-10 w-32" /> </CardFooter> </Card> </div> );
+        return (<div className="container mx-auto p-4 max-w-2xl"> <Card> <CardHeader> <Skeleton className="h-6 w-3/4" /> <Skeleton className="h-4 w-1/2 mt-1" /> </CardHeader> <CardContent className="space-y-4"> <Skeleton className="h-4 w-full" /> <Skeleton className="h-4 w-full" /> <Skeleton className="h-20 w-full" /> </CardContent> <CardFooter> <Skeleton className="h-10 w-32" /> </CardFooter> </Card> </div>);
     }
     if (error) { /* Error UI */
-        return ( <div className="container mx-auto p-4 max-w-2xl"> <Alert variant="destructive"> <AlertTitle>Error Loading Item</AlertTitle> <AlertDescription>{error}</AlertDescription> </Alert> </div> );
+        return (<div className="container mx-auto p-4 max-w-2xl"> <Alert variant="destructive"> <AlertTitle>Error Loading Item</AlertTitle> <AlertDescription>{error}</AlertDescription> </Alert> </div>);
     }
     if (!item) { /* Not Found UI */
-        return ( <div className="container mx-auto p-4 max-w-2xl"> <Alert> <AlertTitle>Item Not Found</AlertTitle> <AlertDescription>The requested item could not be found.</AlertDescription> </Alert> </div> );
+        return (<div className="container mx-auto p-4 max-w-2xl"> <Alert> <AlertTitle>Item Not Found</AlertTitle> <AlertDescription>The requested item could not be found.</AlertDescription> </Alert> </div>);
     }
 
     // --- Render Public Item Details ---
@@ -155,16 +155,15 @@ const PublicItemPage = () => {
                     <CardDescription>Reported on: {formatDate(item.created_at)}</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-3">
-                    {/* ... (Existing item details display - description, date lost, link, images, location) ... */}
-                     <div><h4 className="font-semibold text-sm">Description:</h4><p className="text-sm text-muted-foreground whitespace-pre-wrap">{item.description || 'N/A'}</p></div>
-                     <div><h4 className="font-semibold text-sm">Date Lost:</h4><p className="text-sm text-muted-foreground">{formatDate(item.date_lost)}</p></div>
-                     {item.product_link && (<div><h4 className="font-semibold text-sm">Product Link:</h4><a href={item.product_link} target="_blank" rel="noopener noreferrer" className="text-sm text-blue-600 hover:underline break-all">{item.product_link}</a></div>)}
-                     <div><h4 className="font-semibold text-sm">Images:</h4>{item.image_filenames && item.image_filenames.length > 0 ? (<div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mt-1">{item.image_filenames.map(filename => (<img key={filename} src={`/images/${filename}`} alt="Lost item image" className="rounded border aspect-square object-cover" onError={(e) => e.target.style.display='none'}/>))}</div>) : (<p className="text-sm text-muted-foreground">No images available.</p>)}</div>
-                     {(item.city || item.state || item.country) && (<div><h4 className="font-semibold text-sm">Location:</h4><p className="text-sm text-muted-foreground">{ [item.city, item.state, item.country].filter(Boolean).join(', ') }</p></div>)}
+                    <div><h4 className="font-semibold text-sm">Description:</h4><p className="text-sm text-muted-foreground whitespace-pre-wrap">{item.description || 'N/A'}</p></div>
+                    <div><h4 className="font-semibold text-sm">Date Lost:</h4><p className="text-sm text-muted-foreground">{formatDate(item.date_lost)}</p></div>
+                    {item.product_link && (<div><h4 className="font-semibold text-sm">Product Link:</h4><a href={item.product_link} target="_blank" rel="noopener noreferrer" className="text-sm text-blue-600 hover:underline break-all">{item.product_link}</a></div>)}
+                    <div><h4 className="font-semibold text-sm">Images:</h4>{item.image_filenames && item.image_filenames.length > 0 ? (<div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mt-1">{item.image_filenames.map(filename => (<img key={filename} src={`${process.env.NEXT_PUBLIC_API_HOST}/images/${filename}`} alt="Lost item image" className="rounded border aspect-square object-cover" onError={(e) => e.target.style.display = 'none'} />))}</div>) : (<p className="text-sm text-muted-foreground">No images available.</p>)}</div>
+                    {(item.city || item.state || item.country) && (<div><h4 className="font-semibold text-sm">Location:</h4><p className="text-sm text-muted-foreground">{[item.city, item.state, item.country].filter(Boolean).join(', ')}</p></div>)}
                 </CardContent>
-                 <CardFooter>
-                     {/* === Enhanced Found Item Dialog === */}
-                     <Dialog open={isFoundModalOpen} onOpenChange={setIsFoundModalOpen}>
+                <CardFooter>
+                    {/* === Enhanced Found Item Dialog === */}
+                    <Dialog open={isFoundModalOpen} onOpenChange={setIsFoundModalOpen}>
                         <DialogTrigger asChild>
                             <Button>I Found This Item</Button>
                         </DialogTrigger>
@@ -177,34 +176,34 @@ const PublicItemPage = () => {
                             </DialogHeader>
                             {!foundSubmitSuccess ? (
                                 <form onSubmit={handleFoundSubmit} className="grid gap-4 py-4 max-h-[70vh] overflow-y-auto pr-2"> {/* Scrollable */}
-                                     {/* Finder Contact */}
+                                    {/* Finder Contact */}
                                     <div>
                                         <Label htmlFor="finderContact">Your Contact Info *</Label>
-                                        <Input id="finderContact" value={finderContact} onChange={(e) => setFinderContact(e.target.value)} placeholder="Email, phone, etc." required minLength={5} className="mt-1"/>
+                                        <Input id="finderContact" value={finderContact} onChange={(e) => setFinderContact(e.target.value)} placeholder="Email, phone, etc." required minLength={5} className="mt-1" />
                                     </div>
-                                     {/* Finder Description */}
+                                    {/* Finder Description */}
                                     <div>
-                                         <Label htmlFor="finderDescription">Description (Optional)</Label>
-                                         <Textarea id="finderDescription" value={finderDescription} onChange={(e) => setFinderDescription(e.target.value)} placeholder="Describe the item you found, its condition, etc." maxLength={1000} className="mt-1"/>
+                                        <Label htmlFor="finderDescription">Description (Optional)</Label>
+                                        <Textarea id="finderDescription" value={finderDescription} onChange={(e) => setFinderDescription(e.target.value)} placeholder="Describe the item you found, its condition, etc." maxLength={1000} className="mt-1" />
                                     </div>
-                                     {/* Date Found */}
+                                    {/* Date Found */}
                                     <div>
                                         <Label htmlFor="dateFound">Date Found (Optional)</Label>
-                                        <Input id="dateFound" type="date" onChange={handleDateFoundChange} className="mt-1"/>
+                                        <Input id="dateFound" type="date" onChange={handleDateFoundChange} className="mt-1" />
                                     </div>
                                     {/* Location Found */}
-                                     <div>
+                                    <div>
                                         <Label>Location Found (Optional)</Label>
                                         <div className="mt-1 border p-3 rounded-md">
                                             <LocationSelector onLocationChange={setFoundLocation} initialLocation={foundLocation} />
                                         </div>
                                     </div>
                                     {/* Finder Images */}
-                                     <div>
+                                    <div>
                                         <Label htmlFor="finderImages">Upload Images (Optional, up to {MAX_FINDER_IMAGES})</Label>
-                                        <Input id="finderImages" type="file" multiple accept="image/jpeg, image/png, image/webp, image/gif" onChange={handleFinderImageChange} className="mt-1"/>
-                                         <div className="mt-2 text-sm text-muted-foreground"> Selected images: {finderImages.length} </div>
-                                         {finderImages.length > 0 && (<ul className="mt-2 list-disc list-inside text-xs">{finderImages.map((file, index) => (<li key={index}>{file.name}</li>))}</ul>)}
+                                        <Input id="finderImages" type="file" multiple accept="image/jpeg, image/png, image/webp, image/gif" onChange={handleFinderImageChange} className="mt-1" />
+                                        <div className="mt-2 text-sm text-muted-foreground"> Selected images: {finderImages.length} </div>
+                                        {finderImages.length > 0 && (<ul className="mt-2 list-disc list-inside text-xs">{finderImages.map((file, index) => (<li key={index}>{file.name}</li>))}</ul>)}
                                     </div>
 
                                     {foundSubmitError && <p className="text-red-500 text-sm">{foundSubmitError}</p>}
@@ -216,13 +215,13 @@ const PublicItemPage = () => {
                                     </DialogFooter>
                                 </form>
                             ) : (
-                                 <div className="py-4 text-center">
-                                     <p className="text-green-600 font-medium">Thank you! Your report has been sent to the item's owner.</p>
-                                 </div>
+                                <div className="py-4 text-center">
+                                    <p className="text-green-600 font-medium">Thank you! Your report has been sent to the item's owner.</p>
+                                </div>
                             )}
                         </DialogContent>
                     </Dialog>
-                 </CardFooter>
+                </CardFooter>
             </Card>
         </div>
     );

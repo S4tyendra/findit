@@ -20,7 +20,7 @@ class Config:
     LOCATION_API_KEY: str = os.getenv("LOCATION_API_KEY", "")
 
     # Frontend URL (needed for generating links in emails)
-    FRONTEND_BASE_URL: str = os.getenv("FRONTEND_BASE_URL", "http://localhost:3000")
+    FRONTEND_BASE_URL: str = os.getenv("FRONTEND_BASE_URL", "http://localhost:5353/")
 
     APP_HOST: str = os.getenv("APP_HOST", "localhost")
     APP_PORT: int = int(os.getenv("APP_PORT", "5424"))

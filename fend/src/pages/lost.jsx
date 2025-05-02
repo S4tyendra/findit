@@ -69,7 +69,7 @@ export default function LostItemsPage() {
                         <CardHeader>
                              {item.image_filenames && item.image_filenames.length > 0 && (
                                  <img
-                                     src={`/images/${item.image_filenames[0]}`}
+                                     src={`${process.env.NEXT_PUBLIC_API_HOST}/images/${item.image_filenames[0]}`}
                                      alt="Lost item preview"
                                      className="rounded border aspect-video object-cover mb-2"
                                      onError={(e) => e.target.style.display='none'}

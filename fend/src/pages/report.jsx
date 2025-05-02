@@ -63,7 +63,7 @@ const ReportLostItemPage = () => {
 
         try {
             const result = await createLostItem(formData);
-            setSuccessMessage(`Report submitted successfully! Your management link has been sent to ${reporterEmail}. Item ID: ${result.id}`);
+            setSuccessMessage(`Report submitted successfully! Your management link has been sent to ${reporterEmail}.`);
             // Optionally clear the form
             setDescription('');
             setReporterEmail('');

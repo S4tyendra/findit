@@ -273,7 +273,7 @@ const ManageItemPage = () => {
                             <h4 className="font-semibold text-sm">Images</h4>
                             {item.image_filenames && item.image_filenames.length > 0 ? (
                                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mt-1">
-                                    {item.image_filenames.map(filename => ( <img key={filename} src={`/images/${filename}`} alt="Lost item" className="rounded border aspect-square object-cover" onError={(e) => e.target.style.display='none'}/> ))}
+                                    {item.image_filenames.map(filename => ( <img key={filename} src={`${process.env.NEXT_PUBLIC_API_HOST}/images/${filename}`} alt="Lost item" className="rounded border aspect-square object-cover" onError={(e) => e.target.style.display='none'}/> ))}
                                 </div>
                             ) : (<p className="text-sm text-muted-foreground mt-1">No images uploaded.</p>)}
                             {/* TODO: Add image management (delete/add) in a later phase if needed */}

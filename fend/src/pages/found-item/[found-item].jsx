@@ -48,7 +48,7 @@ const ClaimDialog = ({ open, onOpenChange, onSubmit, isSubmitting, error, succes
                 onOpenChange(isOpen);
             }
         }}>
-            
+
             <DialogContent className="sm:max-w-lg backdrop-blur-3xl bg-white/30 dark:bg-black/30">
                 <form onSubmit={handleSubmit}>
                     <DialogHeader>
@@ -267,7 +267,7 @@ const FoundItemPage = () => {
                                         <CarouselItem key={index}>
                                             <div className="relative aspect-video">
                                                 <img
-                                                    src={`/images/${filename}`}
+                                                    src={`${process.env.NEXT_PUBLIC_API_HOST}/images/${filename}`}
                                                     alt={`Found item image ${index + 1}`}
                                                     className="absolute inset-0 w-full h-full object-contain bg-muted/30 rounded-lg"
                                                     loading="lazy"
