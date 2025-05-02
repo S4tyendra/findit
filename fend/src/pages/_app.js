@@ -6,7 +6,6 @@ import Layout from "@/components/Layout/layout";
 
 
 function MyApp({ Component, pageProps }) {
-  const router = useRouter();
   
   const PageComponent = (
     <Layout>

@@ -7,6 +7,7 @@ load_dotenv()
 class Config:
     MONGO_URI: str = os.getenv("MONGO_URI", "mongodb://localhost:27017")
     MONGO_DB_NAME: str = os.getenv("MONGO_DB_NAME", "lost_n_found")
+    MONGO_WCA = os.getenv("MONGO_WCA", "")
 
     # Email Settings (Gmail SMTP)
     SMTP_SERVER: str = os.getenv("SMTP_SERVER", "smtp.gmail.com")

@@ -3,6 +3,7 @@ import React from 'react';
 import Link from 'next/link';
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from '@/components/ThemeToggle';
+import { Toaster } from '../ui/sonner';
 
 export default function Layout({ children }) {
   return (
@@ -61,6 +62,10 @@ export default function Layout({ children }) {
           </div>
         </div>
       </main>
+
+      {/* Toast */}
+
+      <Toaster/>
 
       {/* Footer */}
       <footer className="backdrop-blur-sm bg-background/80 border-t border-border/40 py-6 px-6">

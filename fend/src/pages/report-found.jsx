@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import LocationSelector from '@/components/LocationSelector';
 import { createFoundItem } from '@/lib/apiClient'; // Use the new API function
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { toast } from 'sonner';
 
 const MAX_IMAGES = 5; // Consistent max images
 
@@ -57,8 +58,8 @@ const ReportFoundItemPage = () => {
 
         try {
             const result = await createFoundItem(formData); // Call the correct API function
-            setSuccessMessage(`Found item report submitted successfully! Thank you. Item ID: ${result.id}`);
-            // Clear the form
+            toast(`Found item report submitted successfully! Thank you.`);
+            router.push('/found');
             setDescription('');
             setFinderContact('');
             setDateFound(null);
