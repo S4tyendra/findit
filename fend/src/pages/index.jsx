@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { listPublicItems, listPublicFoundItems } from '@/lib/apiClient'; // Import both functions
+import { listPublicItems, listPublicFoundItems } from '@/lib/apiClient';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Skeleton } from "@/components/ui/skeleton";
+import { ArrowRight, Search, Map, Bell } from 'lucide-react';
 
 export default function HomePage() {
     const [lostItems, setLostItems] = useState([]);
@@ -13,7 +14,6 @@ export default function HomePage() {
     const [isLoadingFound, setIsLoadingFound] = useState(true);
     const [errorLost, setErrorLost] = useState(null);
     const [errorFound, setErrorFound] = useState(null);
-    // TODO: Add state for pagination
 
     useEffect(() => {
         setIsLoadingLost(true);
@@ -51,146 +51,186 @@ export default function HomePage() {
         } catch (e) { return dateString; }
     };
 
-    // Function to render Lost Items
-    const renderLostItems = () => {
-        if (isLoadingLost) {
-            return (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {[...Array(6)].map((_, index) => (
-                         <Card key={`lost-skeleton-${index}`}>
-                            <CardHeader><Skeleton className="h-5 w-3/4" /></CardHeader>
-                            <CardContent><Skeleton className="h-4 w-full" /></CardContent>
-                            <CardFooter><Skeleton className="h-4 w-1/2" /></CardFooter>
-                         </Card>
-                    ))}
-                </div>
-            );
-        }
-
-        if (errorLost) {
-            return (
-                <Alert variant="destructive">
-                    <AlertTitle>Error Loading Lost Items</AlertTitle>
-                    <AlertDescription>{errorLost}</AlertDescription>
-                </Alert>
-            );
-        }
-
-        if (lostItems.length === 0) {
-            return <p className="text-muted-foreground">No lost items recently reported.</p>;
-        }
-
-        // Render lost item cards
-        return (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {lostItems.map(item => (
-                    <Card key={item._id}>
-                        <CardHeader>
-                             {item.image_filenames && item.image_filenames.length > 0 && (
-                                 <img
-                                     src={`/images/${item.image_filenames[0]}`}
-                                     alt="Lost item preview"
-                                     className="rounded border aspect-video object-cover mb-2"
-                                     onError={(e) => e.target.style.display='none'}
-                                 />
-                             )}
-                            <CardTitle className="text-lg truncate">{item.description.substring(0, 50)}{item.description.length > 50 ? '...' : ''}</CardTitle>
-                             <CardDescription>Lost on: {formatDate(item.date_lost)}</CardDescription>
-                        </CardHeader>
-                        <CardFooter>
-                            <Link href={`/item/${item._id}`} passHref>
-                                <Button variant="outline" size="sm">View Details</Button>
+    return (
+        <div className="space-y-12 pb-8">
+            {/* Hero Section */}
+            <section className="relative py-20 overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-accent/10 to-secondary/10" />
+                <div className="container relative">
+                    <div className="max-w-3xl mx-auto text-center space-y-8">
+                        <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight bg-gradient-to-r from-primary via-accent to-secondary bg-clip-text text-transparent">
+                            Lost Something?<br />We'll Help You Find It
+                        </h1>
+                        <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto">
+                            Our community-driven platform helps connect lost items with their owners. Report what you've lost or found, and let's make reuniting easier.
+                        </p>
+                        <div className="flex flex-wrap justify-center gap-4">
+                            <Link href="/report" passHref>
+                                <Button size="lg" className="gap-2">
+                                    Report Lost Item <ArrowRight className="w-4 h-4" />
+                                </Button>
                             </Link>
-                        </CardFooter>
-                    </Card>
-                ))}
-            </div>
-        );
-    };
-
-    // Function to render Found Items
-    const renderFoundItems = () => {
-        if (isLoadingFound) {
-            return (
-                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                     {[...Array(3)].map((_, index) => ( // Show fewer skeletons for found items initially
-                          <Card key={`found-skeleton-${index}`}>
-                             <CardHeader><Skeleton className="h-5 w-3/4" /></CardHeader>
-                             <CardContent><Skeleton className="h-4 w-full" /></CardContent>
-                             <CardFooter><Skeleton className="h-4 w-1/2" /></CardFooter>
-                          </Card>
-                     ))}
-                 </div>
-             );
-        }
-
-        if (errorFound) {
-            return (
-                <Alert variant="destructive">
-                    <AlertTitle>Error Loading Found Items</AlertTitle>
-                    <AlertDescription>{errorFound}</AlertDescription>
-                </Alert>
-            );
-        }
-
-        if (foundItems.length === 0) {
-            return <p className="text-muted-foreground">No found items recently reported.</p>;
-        }
-
-        // Render found item cards
-        return (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"> {/* Ensure this div closes */}
-                {foundItems.map(item => (
-                    <Card key={item._id}>
-                        <CardHeader>
-                             {item.image_filenames && item.image_filenames.length > 0 && (
-                                 <img
-                                     src={`/images/${item.image_filenames[0]}`}
-                                     alt="Found item preview"
-                                     className="rounded border aspect-video object-cover mb-2"
-                                     onError={(e) => e.target.style.display='none'}
-                                 />
-                             )}
-                            <CardTitle className="text-lg truncate">{item.description.substring(0, 50)}{item.description.length > 50 ? '...' : ''}</CardTitle>
-                             <CardDescription>Found on: {formatDate(item.date_found)}</CardDescription>
-                        </CardHeader>
-                        <CardFooter>
-                             {/* No detail page for found items yet */}
-                        </CardFooter>
-                    </Card>
-                ))}
-            </div>
-        );
-    };    return (
-        <div className="container mx-auto p-4">
-            {/* Page Title */}
-            <div className="mb-6">
-                <h1 className="text-2xl font-bold">Welcome to Lost & Found</h1>
-                <p className="text-muted-foreground">Helping reunite owners with their lost items.</p>
-            </div>
-
-            {/* Lost Items Section */}
-            <section className="mb-8">
-                <div className="flex justify-between items-center mb-4">
-                    <h2 className="text-xl font-semibold">Recently Lost Items</h2>
-                    <Link href="/lost" passHref>
-                        <Button variant="link" size="sm">View All Lost</Button>
-                    </Link>
+                            <Link href="/found" passHref>
+                                <Button size="lg" variant="outline" className="gap-2">
+                                    Browse Found Items <Search className="w-4 h-4" />
+                                </Button>
+                            </Link>
+                        </div>
+                    </div>
                 </div>
-                {renderLostItems()}
             </section>
 
-            {/* Found Items Section */}
-            <section>
-                <div className="flex justify-between items-center mb-4">
-                    <h2 className="text-xl font-semibold">Recently Found Items</h2>
-                    <Link href="/found" passHref>
-                        <Button variant="link" size="sm">View All Found</Button>
-                    </Link>
+            {/* Features Section */}
+            <section className="container">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <Card className="bg-card/50 backdrop-blur-sm">
+                        <CardHeader>
+                            <Search className="w-8 h-8 text-primary mb-2" />
+                            <CardTitle>Easy Search</CardTitle>
+                            <CardDescription>
+                                Quickly search through reported items with our smart filtering system.
+                            </CardDescription>
+                        </CardHeader>
+                    </Card>
+                    <Card className="bg-card/50 backdrop-blur-sm">
+                        <CardHeader>
+                            <Map className="w-8 h-8 text-primary mb-2" />
+                            <CardTitle>Location Tracking</CardTitle>
+                            <CardDescription>
+                                Track items with precise location information to increase chances of recovery.
+                            </CardDescription>
+                        </CardHeader>
+                    </Card>
+                    <Card className="bg-card/50 backdrop-blur-sm">
+                        <CardHeader>
+                            <Bell className="w-8 h-8 text-primary mb-2" />
+                            <CardTitle>Instant Alerts</CardTitle>
+                            <CardDescription>
+                                Get notified immediately when someone finds an item matching your description.
+                            </CardDescription>
+                        </CardHeader>
+                    </Card>
                 </div>
-                {renderFoundItems()}
+            </section>
+
+            {/* Recent Items Sections */}
+            <section className="container">
+                <div className="space-y-12">
+                    {/* Lost Items */}
+                    <div>
+                        <div className="flex justify-between items-center mb-6">
+                            <h2 className="text-2xl font-bold">Recently Lost Items</h2>
+                            <Link href="/lost" className="text-primary hover:text-primary/80 transition-colors">
+                                View all <ArrowRight className="w-4 h-4 inline ml-1" />
+                            </Link>
+                        </div>
+                        
+                        {errorLost && (
+                            <Alert variant="destructive">
+                                <AlertTitle>Error</AlertTitle>
+                                <AlertDescription>{errorLost}</AlertDescription>
+                            </Alert>
+                        )}
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                            {isLoadingLost ? (
+                                Array(3).fill(0).map((_, i) => (
+                                    <Card key={i} className="bg-card/50 backdrop-blur-sm">
+                                        <CardHeader>
+                                            <Skeleton className="h-4 w-2/3" />
+                                            <Skeleton className="h-4 w-full mt-2" />
+                                        </CardHeader>
+                                        <CardContent>
+                                            <Skeleton className="h-20 w-full rounded-lg" />
+                                        </CardContent>
+                                    </Card>
+                                ))
+                            ) : (
+                                lostItems.map(item => (
+                                    <Card key={item._id} className="group hover:shadow-lg transition-all duration-300 bg-card/50 backdrop-blur-sm">
+                                        <CardHeader>
+                                            <CardTitle className="line-clamp-1">{item.title}</CardTitle>
+                                            <CardDescription className="line-clamp-2">{item.description}</CardDescription>
+                                        </CardHeader>
+                                        <CardContent>
+                                            <p className="text-sm text-muted-foreground">
+                                                Lost on: {formatDate(item.date)}
+                                            </p>
+                                            <p className="text-sm text-muted-foreground">
+                                                Location: {item.location || 'Not specified'}
+                                            </p>
+                                        </CardContent>
+                                        <CardFooter>
+                                            <Link href={`/item/${item._id}`} passHref>
+                                                <Button variant="ghost" className="w-full group-hover:bg-primary/10">
+                                                    View Details
+                                                </Button>
+                                            </Link>
+                                        </CardFooter>
+                                    </Card>
+                                ))
+                            )}
+                        </div>
+                    </div>
+
+                    {/* Found Items */}
+                    <div>
+                        <div className="flex justify-between items-center mb-6">
+                            <h2 className="text-2xl font-bold">Recently Found Items</h2>
+                            <Link href="/found" className="text-primary hover:text-primary/80 transition-colors">
+                                View all <ArrowRight className="w-4 h-4 inline ml-1" />
+                            </Link>
+                        </div>
+
+                        {errorFound && (
+                            <Alert variant="destructive">
+                                <AlertTitle>Error</AlertTitle>
+                                <AlertDescription>{errorFound}</AlertDescription>
+                            </Alert>
+                        )}
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                            {isLoadingFound ? (
+                                Array(3).fill(0).map((_, i) => (
+                                    <Card key={i} className="bg-card/50 backdrop-blur-sm">
+                                        <CardHeader>
+                                            <Skeleton className="h-4 w-2/3" />
+                                            <Skeleton className="h-4 w-full mt-2" />
+                                        </CardHeader>
+                                        <CardContent>
+                                            <Skeleton className="h-20 w-full rounded-lg" />
+                                        </CardContent>
+                                    </Card>
+                                ))
+                            ) : (
+                                foundItems.map(item => (
+                                    <Card key={item._id} className="group hover:shadow-lg transition-all duration-300 bg-card/50 backdrop-blur-sm">
+                                        <CardHeader>
+                                            <CardTitle className="line-clamp-1">{item.title}</CardTitle>
+                                            <CardDescription className="line-clamp-2">{item.description}</CardDescription>
+                                        </CardHeader>
+                                        <CardContent>
+                                            <p className="text-sm text-muted-foreground">
+                                                Found on: {formatDate(item.date)}
+                                            </p>
+                                            <p className="text-sm text-muted-foreground">
+                                                Location: {item.location || 'Not specified'}
+                                            </p>
+                                        </CardContent>
+                                        <CardFooter>
+                                            <Link href={`/item/${item._id}`} passHref>
+                                                <Button variant="ghost" className="w-full group-hover:bg-primary/10">
+                                                    View Details
+                                                </Button>
+                                            </Link>
+                                        </CardFooter>
+                                    </Card>
+                                ))
+                            )}
+                        </div>
+                    </div>
+                </div>
             </section>
         </div>
     );
-    
 }
