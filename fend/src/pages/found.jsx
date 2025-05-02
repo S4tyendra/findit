@@ -95,12 +95,10 @@ export default function FoundItemsPage() {
 
     return (
         <div className="container mx-auto p-4">
-             <div className="flex justify-between items-center mb-6">
+             <div className="flex flex-col mb-6">
                 <h1 className="text-2xl font-bold">Reported Found Items</h1>
-                 <Link href="/report-found" passHref>
-                    <Button>Report a Found Item</Button>
-                </Link>
-            </div>
+                <p className="text-muted-foreground">Browse items that have been found and reported.</p>
+             </div>
             {renderItemList()}
         </div>
     );

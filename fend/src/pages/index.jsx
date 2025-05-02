@@ -161,60 +161,36 @@ export default function HomePage() {
                 ))}
             </div>
         );
-    };
+    };    return (
+        <div className="container mx-auto p-4">
+            {/* Page Title */}
+            <div className="mb-6">
+                <h1 className="text-2xl font-bold">Welcome to Lost & Found</h1>
+                <p className="text-muted-foreground">Helping reunite owners with their lost items.</p>
+            </div>
 
+            {/* Lost Items Section */}
+            <section className="mb-8">
+                <div className="flex justify-between items-center mb-4">
+                    <h2 className="text-xl font-semibold">Recently Lost Items</h2>
+                    <Link href="/lost" passHref>
+                        <Button variant="link" size="sm">View All Lost</Button>
+                    </Link>
+                </div>
+                {renderLostItems()}
+            </section>
 
-    return (
-        <div className="flex min-h-screen">
-            {/* Left Sidebar - Branding Placeholder */}
-            <aside className="w-64 bg-card p-4 border-r hidden md:block">
-                <h1 className="text-2xl font-bold mb-4">Lost & Found</h1>
-                <p className="text-sm text-muted-foreground">Helping reunite owners with their lost items.</p>
-                {/* Add more branding or navigation later */}
-            </aside>
-
-            {/* Main Content Area */}
-            <main className="flex-1 p-6 space-y-8">
-                {/* Header Section */}
-                <div className="flex justify-between items-center">
-                     {/* Mobile Branding */}
-                     <h1 className="text-xl font-bold md:hidden">Lost & Found</h1>
-                     {/* Desktop Title - hidden on small screens */}
-                     <h1 className="text-2xl font-bold hidden md:block">Welcome to Lost & Found</h1>
-                     <div className="flex space-x-2">
-                         <Link href="/report-found" passHref>
-                             <Button>Report Found Item</Button>
-                         </Link>
-                         <Link href="/report" passHref>
-                            <Button>Report Lost Item</Button>
-                         </Link>
-                     </div>
-                 </div>
-
-                 {/* Lost Items Section */}
-                 <section>
-                    <div className="flex justify-between items-center mb-4">
-                        <h2 className="text-xl font-semibold">Recently Lost Items</h2>
-                        <Link href="/lost" passHref>
-                             <Button variant="link" size="sm">View All Lost</Button>
-                        </Link>
-                    </div>
-                    {renderLostItems()}
-                 </section>
-
-                 {/* Found Items Section */}
-                 <section>
-                     <div className="flex justify-between items-center mb-4">
-                         <h2 className="text-xl font-semibold">Recently Found Items</h2>
-                         <Link href="/found" passHref>
-                              <Button variant="link" size="sm">View All Found</Button>
-                         </Link>
-                     </div>
-                     {renderFoundItems()}
-                 </section>
-
-                 {/* TODO: Add combined activity feed or search later */}
-            </main>
+            {/* Found Items Section */}
+            <section>
+                <div className="flex justify-between items-center mb-4">
+                    <h2 className="text-xl font-semibold">Recently Found Items</h2>
+                    <Link href="/found" passHref>
+                        <Button variant="link" size="sm">View All Found</Button>
+                    </Link>
+                </div>
+                {renderFoundItems()}
+            </section>
         </div>
     );
+    
 }
