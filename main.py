@@ -77,39 +77,12 @@ from fastapi.middleware.httpsredirect import HTTPSRedirectMiddleware
 from starlette.middleware.base import BaseHTTPMiddleware
 import httpx
 
-# Proxy middleware for development
-class DevProxyMiddleware(BaseHTTPMiddleware):
-    async def dispatch(self, request, call_next):
-        if not request.url.path.startswith("/api") and not request.url.path.startswith("/images"):
-            # Proxy to Vite dev server
-            async with httpx.AsyncClient() as client:
-                try:
-                    url = f"http://localhost:5353{request.url.path}"
-                    if request.url.query:
-                        url = f"{url}?{request.url.query}"
-                    
-                    response = await client.request(
-                        method=request.method,
-                        url=url,
-                        headers=request.headers,
-                        content=await request.body()
-                    )
-                    
-                    return f.Response(
-                        content=response.content,
-                        status_code=response.status_code,
-                        headers=dict(response.headers)
-                    )
-                except httpx.RequestError:
-                    return f.Response(status_code=503, content="Vite dev server is not running")
-        return await call_next(request)
 
 # Mount static files directory for uploaded images
 app.mount("/images", StaticFiles(directory="images"), name="uploaded_images")
 
 # Add proxy middleware in development
 
-app.add_middleware(DevProxyMiddleware)
 
 if __name__ == "__main__":
     import uvicorn
